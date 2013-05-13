@@ -1,8 +1,0 @@
-env = Environment()
-
-env['APP_TARGET'] = 'UVorApp'
-env['APP_SOURCES'] = ['UVorApp.cpp']
-env['RESOURCES'] = ['chunkfive.ttf']
-
-SConscript('../../../../scons/SConscript', exports = 'env')
-
