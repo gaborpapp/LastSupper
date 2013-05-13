@@ -57,7 +57,7 @@ const char *KawaseStreak::sStreakFragmentShader = "#version 120\n"
 			// a = attenuation
 			// b = 4^(pass-1)
 			// s = sample number
-			float b = pow( NUM_SAMPLES, iteration );
+			float b = pow( float( NUM_SAMPLES ), float( iteration ) );
 			for ( int s = 0; s < NUM_SAMPLES; s++ )
 			{
 				float weight = pow( attenuation, b * s );
