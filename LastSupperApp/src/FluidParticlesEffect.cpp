@@ -15,13 +15,19 @@
  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+
+#include <boost/assign/std/vector.hpp>
+
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "cinder/ip/Resize.h"
+#include "cinder/Rand.h"
 
 #include "FluidParticlesEffect.h"
 #include "GlobalData.h"
 
+using namespace boost::assign;
 using namespace ci;
 using namespace std;
 
@@ -31,6 +37,12 @@ void FluidParticlesEffect::setup()
 
 	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Fluid particles", Vec2i( 310, 300 ), Vec2i( 332, 16 ) );
 	mParams.addPersistentSizeAndPosition();
+
+	vector< string > stateNames;
+	stateNames += "Interactive", "Rain";
+	mState = STATE_INTERACTIVE;
+	mParams.addParam( "Fluid state", stateNames, &mState );
+	mParams.addSeparator();
 
 	mFluidEnabled = true;
 	mParams.addParam( "Fluid particles enabled", &mFluidEnabled );
@@ -119,7 +131,8 @@ void FluidParticlesEffect::update()
 	GlobalData &gd = GlobalData::get();
 
 	// optical flow
-	if ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() )
+	if ( ( mState == STATE_INTERACTIVE ) &&
+		 ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() ) )
 	{
 		Surface8u captSurf( Channel8u( gd.mCaptureSource.getSurface() ) );
 
@@ -183,6 +196,34 @@ void FluidParticlesEffect::update()
 			}
 		}
 	}
+	else
+	if ( mState == STATE_RAIN )
+	{
+		if ( ( Rand::randInt( 128 ) < mParticleMax ) && mFluidEnabled )
+		{
+			// add one falling particle
+			{
+				Vec2f p( Rand::randFloat(), 0.f );
+				if ( ( p.x >= mOptFlowClipRectNorm.x1 ) ||
+				     ( p.x <= mOptFlowClipRectNorm.x2 ) )
+				{
+					Vec2f v( 0.f, 0.05f );
+					v.rotate( Rand::randFloat( -1.f, 1.f ) );
+
+					addToFluid( p, v );
+				}
+			}
+
+			// perturb fluid
+			{
+				Vec2f p( Rand::randFloat(), Rand::randFloat() );
+				Vec2f v( 0.f, 0.05f );
+				v.rotate( Rand::randFloat( 2 * M_PI ) );
+
+				addToFluid( p, v, false, true, true );
+			}
+		}
+	}
 
 	// fluid & particles
 	mFluidSolver.setFadeSpeed( mFluidFadeSpeed );
@@ -215,7 +256,6 @@ void FluidParticlesEffect::drawControl()
 	mParams.draw();
 }
 
-
 void FluidParticlesEffect::addToFluid( const Vec2f &pos, const Vec2f &vel, bool addParticles, bool addForce, bool addColor )
 {
 	Vec2f p;
@@ -230,7 +270,7 @@ void FluidParticlesEffect::addToFluid( const Vec2f &pos, const Vec2f &vel, bool 
 					lmap<float>( vel.length() * mVelParticleMult * mParticlesFbo.getWidth(),
 						mVelParticleMin, mVelParticleMax,
 						mParticleMin, mParticleMax ) );
-			if (count > 0)
+			if ( count > 0 )
 			{
 				if ( addParticles )
 					mParticles.addParticle( p * Vec2f( mParticlesFbo.getSize() ), count );
@@ -353,9 +393,4 @@ void FluidParticlesEffect::mouseUp( app::MouseEvent event )
 {
 	mouseDrag( event );
 }
-
-void FluidParticlesEffect::mouseMove( app::MouseEvent event )
-{
-}
-
 

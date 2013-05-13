@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "cinder/gl/Texture.h"
 
@@ -24,7 +23,6 @@ class FluidParticlesEffect : public Effect
 		void mouseDown( ci::app::MouseEvent event );
 		void mouseDrag( ci::app::MouseEvent event );
 		void mouseUp( ci::app::MouseEvent event );
-		void mouseMove( ci::app::MouseEvent event );
 
 		void setup();
 
@@ -93,5 +91,12 @@ class FluidParticlesEffect : public Effect
 		ci::Rectf mOptFlowClipRectNorm;
 		ci::Vec2f mMouseStartNorm, mMouseEndNorm;
 		bool mIsActive;
+
+		enum
+		{
+			STATE_INTERACTIVE = 0,
+			STATE_RAIN
+		};
+		int mState;
 };
 
