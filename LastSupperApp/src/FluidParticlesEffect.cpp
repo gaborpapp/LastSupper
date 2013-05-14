@@ -47,7 +47,8 @@ void FluidParticlesEffect::setup()
 	mFluidEnabled = true;
 	mParams.addParam( "Fluid particles enabled", &mFluidEnabled );
 	mParams.addText("Optical flow");
-	mParams.addPersistentParam( "Flip", &mFlip, true );
+	mParams.addPersistentParam( "Flip horizontal", &mFlipHorizontal, true );
+	mParams.addPersistentParam( "Flip vertical", &mFlipVertical, true );
 	mParams.addPersistentParam( "Draw flow", &mDrawFlow, false );
 	mParams.addPersistentParam( "Draw fluid", &mDrawFluid, false );
 	mParams.addPersistentParam( "Draw particles", &mDrawParticles, true );
@@ -150,8 +151,22 @@ void FluidParticlesEffect::update()
 		mCaptureTexture = gl::Texture( captSurf );
 
 		cv::Mat currentFrame( toOcv( Channel( smallSurface ) ) );
-		if ( mFlip )
-			cv::flip( currentFrame, currentFrame, 1 );
+		/* NOTE: seems to be slow, flipping texture instead
+		if ( mFlipHorizontal || mFlipVertical )
+		{
+			int flipCode;
+			if ( mFlipHorizontal && mFlipVertical )
+				flipCode = -1;
+			else
+			if ( mFlipHorizontal )
+				flipCode = 1;
+			else
+				flipCode = 0;
+			cv::flip( currentFrame, currentFrame, flipCode );
+		}
+		mCaptureTexture = gl::Texture( fromOcv( currentFrame ) );
+		*/
+
 		if ( ( mPrevFrame.data ) &&
 			 ( mPrevFrame.size() == cv::Size( mOptFlowWidth, mOptFlowHeight ) ) )
 		{
@@ -295,8 +310,20 @@ void FluidParticlesEffect::draw()
 
 	if ( mDrawFluid )
 	{
+		gl::pushModelView();
+		if ( mFlipHorizontal )
+		{
+			gl::translate( getWidth(), 0 );
+			gl::scale( -1, 1 );
+		}
+		if ( mFlipVertical )
+		{
+			gl::translate( 0, getHeight() );
+			gl::scale( 1, -1 );
+		}
 		gl::color( mFluidColor );
 		mFluidDrawer.draw( 0, 0, getWidth(), getHeight() );
+		gl::popModelView();
 	}
 
 	if ( mDrawParticles )
@@ -320,10 +347,22 @@ void FluidParticlesEffect::draw()
 		{
 			gl::setViewport( getBounds() );
 			gl::setMatricesWindow( getSize() );
+			gl::pushModelView();
+			if ( mFlipHorizontal )
+			{
+				gl::translate( getWidth(), 0 );
+				gl::scale( -1, 1 );
+			}
+			if ( mFlipVertical )
+			{
+				gl::translate( 0, getHeight() );
+				gl::scale( 1, -1 );
+			}
 			if ( mDrawFluid )
 				gl::enableAlphaBlending();
 			gl::color( Color::white() );
 			gl::draw( output, getBounds() );
+			gl::popModelView();
 		}
 		if ( mDrawFluid )
 			gl::disableAlphaBlending();
@@ -337,10 +376,15 @@ void FluidParticlesEffect::draw()
 		mCaptureTexture.enableAndBind();
 
 		gl::pushModelView();
-		if ( mFlip )
+		if ( mFlipHorizontal )
 		{
 			gl::translate( getWidth(), 0 );
 			gl::scale( -1, 1 );
+		}
+		if ( mFlipVertical )
+		{
+			gl::translate( 0, getHeight() );
+			gl::scale( 1, -1 );
 		}
 		gl::drawSolidRect( getBounds() );
 		gl::popModelView();
@@ -353,6 +397,17 @@ void FluidParticlesEffect::draw()
 	gl::disable( GL_TEXTURE_2D );
 	if ( mDrawFlow && mFlow.data )
 	{
+		gl::pushModelView();
+		if ( mFlipHorizontal )
+		{
+			gl::translate( getWidth(), 0 );
+			gl::scale( -1, 1 );
+		}
+		if ( mFlipVertical )
+		{
+			gl::translate( 0, getHeight() );
+			gl::scale( 1, -1 );
+		}
 		RectMapping ofToWin( Area( 0, 0, mFlow.cols, mFlow.rows ),
 				getBounds() );
 		float ofScale = mFlowMultiplier * getWidth() / (float)mOptFlowWidth;
@@ -367,6 +422,7 @@ void FluidParticlesEffect::draw()
 						ofToWin.map( p + ofScale * v ) );
 			}
 		}
+		gl::popModelView();
 	}
 }
 

@@ -2,8 +2,7 @@
 
 #include "Effect.h"
 
-class BlackEffect;
-typedef std::shared_ptr< BlackEffect > BlackEffectRef;
+typedef std::shared_ptr< class BlackEffect > BlackEffectRef;
 
 class BlackEffect: public Effect
 {

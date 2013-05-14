@@ -12,8 +12,7 @@
 #include "FluidParticles.h"
 #include "KawaseStreak.h"
 
-class FluidParticlesEffect;
-typedef std::shared_ptr< FluidParticlesEffect > FluidParticlesEffectRef;
+typedef std::shared_ptr< class FluidParticlesEffect > FluidParticlesEffectRef;
 
 class FluidParticlesEffect : public Effect
 {
@@ -39,7 +38,8 @@ class FluidParticlesEffect : public Effect
 		ci::gl::Texture mCaptureTexture;
 
 		// optflow
-		bool mFlip;
+		bool mFlipHorizontal;
+		bool mFlipVertical;
 		bool mDrawFlow;
 		bool mDrawFluid;
 		bool mDrawParticles;
