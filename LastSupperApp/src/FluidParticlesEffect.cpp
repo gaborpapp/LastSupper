@@ -52,7 +52,10 @@ void FluidParticlesEffect::setup()
 	mParams.addPersistentParam( "Draw flow", &mDrawFlow, false );
 	mParams.addPersistentParam( "Draw fluid", &mDrawFluid, false );
 	mParams.addPersistentParam( "Draw particles", &mDrawParticles, true );
-	mParams.addPersistentParam( "Draw capture", &mDrawCapture, true );
+	vector< string > captureStateNames;
+	captureStateNames += "Control", "Both";
+	mDrawCapture = CAPTURE_CONTROL;
+	mParams.addParam( "Draw capture", captureStateNames, &mDrawCapture );
 	mParams.addPersistentParam( "Capture alpha", &mCaptureAlpha, .1f, "min=0 max=1 step=0.05" );
 	mParams.addPersistentParam( "Flow multiplier", &mFlowMultiplier, .105, "min=.001 max=2 step=.001" );
 	mParams.addPersistentParam( "Flow width", &mOptFlowWidth, 160, "min=20 max=640", true );
@@ -266,6 +269,33 @@ void FluidParticlesEffect::drawControl()
 		gl::drawSolidRect( maskRect );
 		gl::disableAlphaBlending();
 		gl::color( Color::white() );
+
+		// capture only in control window
+		if ( ( mDrawCapture == CAPTURE_CONTROL ) &&
+				 mCaptureTexture )
+		{
+			gl::enableAdditiveBlending();
+			gl::color( ColorA( 1, 1, 1, mCaptureAlpha ) );
+			mCaptureTexture.enableAndBind();
+
+			gl::pushModelView();
+			const int previewBorder = 16; // FIXME: preview border hardcoded
+			if ( mFlipHorizontal )
+			{
+				gl::translate( 2 * gd.mControlWindow->getWidth() - gd.mPreviewRect.getWidth() - 2 * previewBorder, 0 );
+				gl::scale( -1, 1 );
+			}
+			if ( mFlipVertical )
+			{
+				gl::translate( 0, gd.mPreviewRect.getHeight() + 2 * previewBorder );
+				gl::scale( 1, -1 );
+			}
+			gl::drawSolidRect( gd.mPreviewRect );
+			gl::popModelView();
+			mCaptureTexture.unbind();
+			gl::color( Color::white() );
+			gl::disableAlphaBlending();
+		}
 	}
 
 	mParams.draw();
@@ -369,7 +399,7 @@ void FluidParticlesEffect::draw()
 	}
 
 	// draw output to window
-	if ( mDrawCapture && mCaptureTexture )
+	if ( ( mDrawCapture == CAPTURE_BOTH ) && mCaptureTexture )
 	{
 		gl::enableAdditiveBlending();
 		gl::color( ColorA( 1, 1, 1, mCaptureAlpha ) );

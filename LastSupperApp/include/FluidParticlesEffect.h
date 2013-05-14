@@ -43,7 +43,13 @@ class FluidParticlesEffect : public Effect
 		bool mDrawFlow;
 		bool mDrawFluid;
 		bool mDrawParticles;
-		bool mDrawCapture;
+		//bool mDrawCapture;
+		enum
+		{
+			CAPTURE_CONTROL = 0,
+			CAPTURE_BOTH
+		};
+		int mDrawCapture;
 		float mCaptureAlpha;
 		float mFlowMultiplier;
 
