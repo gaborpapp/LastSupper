@@ -265,26 +265,33 @@ int32_t CaptureSource::getHeight() const
 
 ci::Surface8u CaptureSource::getSurface()
 {
+	ci::Surface8u surface;
 	switch ( mSource )
 	{
 		case SOURCE_CAPTURE:
-			return mCaptures[ mCurrentCapture ]->getSurface();
+			surface = mCaptures[ mCurrentCapture ]->getSurface();
 			break;
 
 #ifdef CAPTURE_1394
 		case SOURCE_CAPTURE1394:
-			return mCapture1394PParams->getCurrentCaptureRef()->getSurface();
+			surface = mCapture1394PParams->getCurrentCaptureRef()->getSurface();
 			break;
 #endif
 
 		case SOURCE_RECORDING:
-			return mMovie.getSurface();
+			surface = mMovie.getSurface();
 			break;
 
 		default:
-			return ci::Surface8u();
 			break;
 	}
+
+	if ( mSavingVideo )
+	{
+		mMovieWriter.addFrame( surface );
+	}
+
+	return surface;
 }
 
 void CaptureSource::saveVideoCB()
@@ -305,7 +312,7 @@ void CaptureSource::saveVideoCB()
 
 		ci::fs::path appPath = ci::app::getAppPath();
 #ifdef CINDER_MAC
-		appPath /= "..";
+		appPath = appPath.parent_path();
 #endif
 		boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 		string timestamp = boost::posix_time::to_iso_string( now );

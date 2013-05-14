@@ -35,7 +35,7 @@ void FluidParticlesEffect::setup()
 {
 	GlobalData &gd = GlobalData::get();
 
-	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Fluid particles", Vec2i( 310, 300 ), Vec2i( 332, 16 ) );
+	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "FluidParticles", Vec2i( 310, 300 ), Vec2i( 332, 16 ) );
 	mParams.addPersistentSizeAndPosition();
 
 	vector< string > stateNames;
@@ -46,6 +46,14 @@ void FluidParticlesEffect::setup()
 
 	mFluidEnabled = true;
 	mParams.addParam( "Fluid particles enabled", &mFluidEnabled );
+
+	vector< std::pair< std::string, boost::any > > vars;
+	vars.push_back( make_pair( "Flow multiplier", &mFlowMultiplier ) );
+	vars.push_back( make_pair( "Fluid velocity mult", &mFluidVelocityMult ) );
+	mParams.addSeparator();
+	mParams.addPresets( vars );
+	mParams.addSeparator();
+
 	mParams.addText("Optical flow");
 	mParams.addPersistentParam( "Flip horizontal", &mFlipHorizontal, true );
 	mParams.addPersistentParam( "Flip vertical", &mFlipVertical, true );
@@ -53,7 +61,7 @@ void FluidParticlesEffect::setup()
 	mParams.addPersistentParam( "Draw fluid", &mDrawFluid, false );
 	mParams.addPersistentParam( "Draw particles", &mDrawParticles, true );
 	vector< string > captureStateNames;
-	captureStateNames += "Control", "Both";
+	captureStateNames += "Control", "Both", "None";
 	mDrawCapture = CAPTURE_CONTROL;
 	mParams.addParam( "Draw capture", captureStateNames, &mDrawCapture );
 	mParams.addPersistentParam( "Capture alpha", &mCaptureAlpha, .1f, "min=0 max=1 step=0.05" );
@@ -217,12 +225,17 @@ void FluidParticlesEffect::update()
 	else
 	if ( mState == STATE_RAIN )
 	{
+		if ( ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() ) )
+		{
+			mCaptureTexture = gl::Texture( Channel8u( gd.mCaptureSource.getSurface() ) );
+		}
+
 		if ( ( Rand::randInt( 128 ) < mParticleMax ) && mFluidEnabled )
 		{
 			// add one falling particle
 			{
 				Vec2f p( Rand::randFloat(), 0.f );
-				if ( ( p.x >= mOptFlowClipRectNorm.x1 ) ||
+				if ( ( p.x >= mOptFlowClipRectNorm.x1 ) &&
 				     ( p.x <= mOptFlowClipRectNorm.x2 ) )
 				{
 					Vec2f v( 0.f, 0.05f );
