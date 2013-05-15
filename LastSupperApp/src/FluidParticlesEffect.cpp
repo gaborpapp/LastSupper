@@ -50,6 +50,7 @@ void FluidParticlesEffect::setup()
 	vector< std::pair< std::string, boost::any > > vars;
 	vars.push_back( make_pair( "Flow multiplier", &mFlowMultiplier ) );
 	vars.push_back( make_pair( "Fluid velocity mult", &mFluidVelocityMult ) );
+	vars.push_back( make_pair( "Particle max", &mParticleMax ) );
 	mParams.addSeparator();
 	mParams.addPresets( vars );
 	mParams.addSeparator();
