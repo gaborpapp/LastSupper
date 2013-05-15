@@ -142,12 +142,25 @@ void FluidParticlesEffect::update()
 {
 	GlobalData &gd = GlobalData::get();
 
-	// optical flow
-	if ( ( mState == STATE_INTERACTIVE ) &&
-		 ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() ) )
+	Surface8u captSurf;
+	if ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() )
 	{
-		Surface8u captSurf( Channel8u( gd.mCaptureSource.getSurface() ) );
+		captSurf = Surface8u( Channel8u( gd.mCaptureSource.getSurface() ) );
 
+		if ( !mCaptureTexture || ( mCaptureTexture.getWidth() != captSurf.getWidth() ) ||
+			( mCaptureTexture.getHeight() != captSurf.getHeight() ) )
+		{
+			mCaptureTexture = gl::Texture( captSurf );
+		}
+		else
+		{
+			mCaptureTexture.update( captSurf, mCaptureTexture.getBounds() );
+		}
+	}
+
+	// optical flow
+	if ( ( mState == STATE_INTERACTIVE ) && captSurf )
+	{
 		Surface8u smallSurface( mOptFlowWidth, mOptFlowHeight, false );
 		if ( ( captSurf.getWidth() != mOptFlowWidth ) ||
 				( captSurf.getHeight() != mOptFlowHeight ) )
@@ -159,7 +172,6 @@ void FluidParticlesEffect::update()
 			smallSurface = captSurf;
 		}
 
-		mCaptureTexture = gl::Texture( captSurf );
 
 		cv::Mat currentFrame( toOcv( Channel( smallSurface ) ) );
 		/* NOTE: seems to be slow, flipping texture instead
@@ -225,11 +237,6 @@ void FluidParticlesEffect::update()
 	else
 	if ( mState == STATE_RAIN )
 	{
-		if ( ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() ) )
-		{
-			mCaptureTexture = gl::Texture( Channel8u( gd.mCaptureSource.getSurface() ) );
-		}
-
 		if ( ( Rand::randInt( 128 ) < mParticleMax ) && mFluidEnabled )
 		{
 			// add one falling particle
