@@ -141,27 +141,16 @@ void FluidParticlesEffect::deinstantiate()
 
 void FluidParticlesEffect::update()
 {
+	static int lastState = STATE_INTERACTIVE;
+
 	GlobalData &gd = GlobalData::get();
 
-	Surface8u captSurf;
+	cv::Mat currentFrame;
+	bool newFrame = false;
 	if ( gd.mCaptureSource.isCapturing() && gd.mCaptureSource.checkNewFrame() )
 	{
-		captSurf = Surface8u( Channel8u( gd.mCaptureSource.getSurface() ) );
+		Surface8u captSurf = Surface8u( Channel8u( gd.mCaptureSource.getSurface() ) );
 
-		if ( !mCaptureTexture || ( mCaptureTexture.getWidth() != captSurf.getWidth() ) ||
-			( mCaptureTexture.getHeight() != captSurf.getHeight() ) )
-		{
-			mCaptureTexture = gl::Texture( captSurf );
-		}
-		else
-		{
-			mCaptureTexture.update( captSurf, mCaptureTexture.getBounds() );
-		}
-	}
-
-	// optical flow
-	if ( ( mState == STATE_INTERACTIVE ) && captSurf )
-	{
 		Surface8u smallSurface( mOptFlowWidth, mOptFlowHeight, false );
 		if ( ( captSurf.getWidth() != mOptFlowWidth ) ||
 				( captSurf.getHeight() != mOptFlowHeight ) )
@@ -173,7 +162,7 @@ void FluidParticlesEffect::update()
 			smallSurface = captSurf;
 		}
 
-		cv::Mat currentFrame( toOcv( Channel( smallSurface ) ) );
+		currentFrame = toOcv( Channel( smallSurface ) );
 		if ( mFlipHorizontal || mFlipVertical )
 		{
 			int flipCode;
@@ -186,8 +175,21 @@ void FluidParticlesEffect::update()
 				flipCode = 0;
 			cv::flip( currentFrame, currentFrame, flipCode );
 		}
-		mCaptureTexture = gl::Texture( fromOcv( currentFrame ) );
+		if ( !mCaptureTexture || ( mCaptureTexture.getWidth() != captSurf.getWidth() ) ||
+			( mCaptureTexture.getHeight() != captSurf.getHeight() ) )
+		{
+			mCaptureTexture = gl::Texture( Channel8u( fromOcv( currentFrame ) ) );
+		}
+		else
+		{
+			mCaptureTexture.update( Channel8u( fromOcv( currentFrame ) ), mCaptureTexture.getBounds() );
+		}
+		newFrame = true;
+	}
 
+	// optical flow
+	if ( ( mState == STATE_INTERACTIVE ) && newFrame )
+	{
 		if ( ( mPrevFrame.data ) &&
 			 ( mPrevFrame.size() == cv::Size( mOptFlowWidth, mOptFlowHeight ) ) )
 		{
@@ -235,6 +237,19 @@ void FluidParticlesEffect::update()
 	else
 	if ( mState == STATE_RAIN )
 	{
+		if ( lastState == STATE_INTERACTIVE )
+		{
+			mFluidSolver.reset();
+			mFluidVorticityConfinement = false;
+			for ( int i = 0; i < 100; i++ )
+			{
+				Vec2f p( Rand::randFloat(), Rand::randFloat() );
+				Vec2f v( 0.f, 0.5f );
+
+				addToFluid( p, v, false, true, false );
+			}
+		}
+
 		if ( ( Rand::randInt( 128 ) < mParticleMax ) && mFluidEnabled )
 		{
 			// add one falling particle
@@ -244,22 +259,15 @@ void FluidParticlesEffect::update()
 				     ( p.x <= mOptFlowClipRectNorm.x2 ) )
 				{
 					Vec2f v( 0.f, 0.05f );
-					v.rotate( Rand::randFloat( -1.f, 1.f ) );
+					v.rotate( Rand::randFloat( -.1f, .1f ) );
 
 					addToFluid( p, v );
 				}
 			}
-
-			// perturb fluid
-			{
-				Vec2f p( Rand::randFloat(), Rand::randFloat() );
-				Vec2f v( 0.f, 0.05f );
-				v.rotate( Rand::randFloat( 2 * M_PI ) );
-
-				addToFluid( p, v, false, true, true );
-			}
 		}
 	}
+
+	lastState = mState;
 
 	// fluid & particles
 	mFluidSolver.setFadeSpeed( mFluidFadeSpeed );

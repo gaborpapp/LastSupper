@@ -29,10 +29,12 @@ void FluidParticle::update( double time, const ciMsaFluidSolver *solver, const V
 {
 	mVel = solver->getVelocityAtPos( mPos * invWindowSize ) * (mMass * sFluidForce ) * windowSize + mVel * sMomentum;
 
+	/*
 	if ( mVel.lengthSquared() < 10 )
 	{
 		mVel += Rand::randVec2f() * 3.;
 	}
+	*/
 
 	mPos += mVel;
 
