@@ -29,6 +29,7 @@
 
 #include "BlackEffect.h"
 #include "FluidParticlesEffect.h"
+#include "MaskRect.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -71,6 +72,8 @@ class LastSupperApp : public AppBasic
 #define FBO_HEIGHT 768
 		gl::Fbo mFbo;
 		int mFboOutputAttachment;
+
+		MaskRectRef mMaskRect;
 };
 
 void LastSupperApp::prepareSettings( Settings *settings )
@@ -86,6 +89,9 @@ void LastSupperApp::setup()
 
 	mndl::params::PInterfaceGl::load( "params.xml" );
 
+	gd.mPostProcessingParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Postprocessing", Vec2i( 200, 310 ), Vec2i( 516, 342 ) );
+	gd.mPostProcessingParams.addPersistentSizeAndPosition();
+
 	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Parameters", Vec2i( 200, 310 ), Vec2i( 16, 16 ) );
 	mParams.addPersistentSizeAndPosition();
 	mParams.addParam( "Fps", &mFps, "", true );
@@ -100,6 +106,9 @@ void LastSupperApp::setup()
 	format.enableColorBuffer( true, 2 );
 	mFbo = gl::Fbo( FBO_WIDTH, FBO_HEIGHT, format );
 	mFboOutputAttachment = 0;
+
+	// postprocessing filters
+	mMaskRect = MaskRect::create( mFbo.getWidth(), mFbo.getHeight() );
 
 	// setup effects
 	mEffects.push_back( BlackEffect::create() );
@@ -162,6 +171,19 @@ void LastSupperApp::drawOutput()
 	mFbo.unbindFramebuffer();
 
 	mFboOutputAttachment = 0;
+	if ( mMaskRect->isEnabled() )
+	{
+		gl::Texture processed = mMaskRect->process( mFbo.getTexture( mFboOutputAttachment ) );
+		mFbo.bindFramebuffer();
+		glDrawBuffer( GL_COLOR_ATTACHMENT0_EXT + ( mFboOutputAttachment ^ 1 ) );
+		gl::setViewport( mFbo.getBounds() );
+		gl::setMatricesWindow( mFbo.getSize(), false );
+		gl::color( Color::white() );
+		gl::draw( processed, mFbo.getBounds() );
+		mFbo.unbindFramebuffer();
+		mFboOutputAttachment ^= 1;
+	}
+
 	gl::setViewport( getWindowBounds() );
 	gl::setMatricesWindow( getWindowSize() );
 	gl::clear();
@@ -201,6 +223,7 @@ void LastSupperApp::drawControl()
 	}
 
 	GlobalData::get().mCaptureSource.drawParams();
+	GlobalData::get().mPostProcessingParams.draw();
 }
 
 void LastSupperApp::resize()

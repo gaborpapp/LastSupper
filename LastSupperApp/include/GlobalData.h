@@ -21,5 +21,5 @@ class GlobalData
 		ci::Rectf mPreviewRect;
 
 		mndl::CaptureSource mCaptureSource;
+		mndl::params::PInterfaceGl mPostProcessingParams;
 };
-

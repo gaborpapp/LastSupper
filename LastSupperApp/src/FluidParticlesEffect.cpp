@@ -175,8 +175,9 @@ void FluidParticlesEffect::update()
 				flipCode = 0;
 			cv::flip( currentFrame, currentFrame, flipCode );
 		}
-		if ( !mCaptureTexture || ( mCaptureTexture.getWidth() != captSurf.getWidth() ) ||
-			( mCaptureTexture.getHeight() != captSurf.getHeight() ) )
+
+		if ( !mCaptureTexture || ( mCaptureTexture.getWidth() != smallSurface.getWidth() ) ||
+			( mCaptureTexture.getHeight() != smallSurface.getHeight() ) )
 		{
 			mCaptureTexture = gl::Texture( Channel8u( fromOcv( currentFrame ) ) );
 		}
@@ -184,6 +185,7 @@ void FluidParticlesEffect::update()
 		{
 			mCaptureTexture.update( Channel8u( fromOcv( currentFrame ) ), mCaptureTexture.getBounds() );
 		}
+
 		newFrame = true;
 	}
 

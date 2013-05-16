@@ -4,6 +4,7 @@ env['APP_TARGET'] = 'LastSupperApp'
 env['APP_SOURCES'] = ['LastSupperApp.cpp', 'Capture1394PParams.cpp', 'CaptureSource.cpp',
 				'KawaseStreak.cpp']
 env['APP_SOURCES'] += ['FluidParticlesEffect.cpp', 'FluidParticles.cpp']
+env['APP_SOURCES'] += ['MaskRect.cpp']
 env['DEBUG'] = 0
 
 SConscript('../blocks/msaFluid/scons/SConscript', exports = 'env')
