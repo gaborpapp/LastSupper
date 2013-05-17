@@ -29,6 +29,7 @@ MaskRect::MaskRect( int w, int h )
 gl::Texture MaskRect::process( const gl::Texture &source )
 {
 	gl::SaveFramebufferBinding bindingSaver;
+	Area viewport = gl::getViewport();
 
 	if ( !mEnabled )
 		return source;
@@ -40,6 +41,7 @@ gl::Texture MaskRect::process( const gl::Texture &source )
 
 	RectMapping normalizedToDestination( Rectf( 0, 0, 1, 1 ), mFbo.getBounds() );
 	gl::clear( mColor );
+	gl::color( Color::white() );
 	gl::pushModelView();
 	gl::translate( mOffset * Vec2f( mFbo.getSize() ) * Vec2f( 1, -1 ) );
 	gl::draw( source, mFbo.getBounds() );
@@ -50,6 +52,7 @@ gl::Texture MaskRect::process( const gl::Texture &source )
 	gl::drawSolidRect( normalizedToDestination.map( Rectf( mRectX2, 0, 1, 1 ) ) );
 	gl::drawSolidRect( normalizedToDestination.map( Rectf( 0, 0, 1, mRectY2 ) ) );
 	gl::drawSolidRect( normalizedToDestination.map( Rectf( 0, mRectY1, 1, 1 ) ) );
+	gl::color( Color::white() );
 
 	/*
 	// FIXME: do this with rects
@@ -65,6 +68,7 @@ gl::Texture MaskRect::process( const gl::Texture &source )
 	mFbo.unbindFramebuffer();
 	gl::popMatrices();
 
+	gl::setViewport( viewport );
 	return mFbo.getTexture();
 }
 

@@ -10,17 +10,19 @@ typedef std::shared_ptr< MaskRect > MaskRectRef;
 
 class MaskRect
 {
-    public:
-        static MaskRectRef create( int w, int h ) { return MaskRectRef( new MaskRect( w, h ) ); }
+	public:
+		static MaskRectRef create( int w, int h ) { return MaskRectRef( new MaskRect( w, h ) ); }
 
-        ci::gl::Texture process( const ci::gl::Texture &source );
+		ci::gl::Texture process( const ci::gl::Texture &source );
 
-        bool isEnabled() const { return mEnabled; }
+		bool isEnabled() const { return mEnabled; }
 
-    private:
-        MaskRect( int w, int h );
+		ci::Vec2f getOffset() const  { return mOffset; }
 
-        bool mEnabled;
+	private:
+		MaskRect( int w, int h );
+
+		bool mEnabled;
 
 		float mRectX1, mRectX2;
 		float mRectY1, mRectY2;
@@ -28,5 +30,5 @@ class MaskRect
 		ci::Vec2f mOffset;
 
 		ci::Color mColor;
-        ci::gl::Fbo mFbo;
+		ci::gl::Fbo mFbo;
 };

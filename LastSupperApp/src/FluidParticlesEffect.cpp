@@ -303,11 +303,15 @@ void FluidParticlesEffect::drawControl()
 				 mCaptureTexture )
 		{
 			gl::enableAdditiveBlending();
-			gl::color( ColorA( 1, 1, 1, mCaptureAlpha ) );
+			// FIXME: processed texture should be here if the filter fbo was not flipped
+			Vec2f offset = gd.mMaskRect->getOffset() * gd.mPreviewRect.getSize();
+			gl::pushModelView();
+			gl::translate( offset );
 			mCaptureTexture.enableAndBind();
-
+			gl::color( ColorA( 1, 1, 1, mCaptureAlpha ) );
 			gl::drawSolidRect( gd.mPreviewRect );
 			mCaptureTexture.unbind();
+			gl::popModelView();
 			gl::color( Color::white() );
 			gl::disableAlphaBlending();
 		}

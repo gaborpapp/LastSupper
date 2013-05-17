@@ -6,6 +6,7 @@
 #include "mndlkit/params/PParams.h"
 
 #include "CaptureSource.h"
+#include "MaskRect.h"
 
 class GlobalData
 {
@@ -22,4 +23,6 @@ class GlobalData
 
 		mndl::CaptureSource mCaptureSource;
 		mndl::params::PInterfaceGl mPostProcessingParams;
+
+		MaskRectRef mMaskRect;
 };

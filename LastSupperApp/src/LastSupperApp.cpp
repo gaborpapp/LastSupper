@@ -29,7 +29,6 @@
 
 #include "BlackEffect.h"
 #include "FluidParticlesEffect.h"
-#include "MaskRect.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -72,8 +71,6 @@ class LastSupperApp : public AppBasic
 #define FBO_HEIGHT 768
 		gl::Fbo mFbo;
 		int mFboOutputAttachment;
-
-		MaskRectRef mMaskRect;
 };
 
 void LastSupperApp::prepareSettings( Settings *settings )
@@ -108,7 +105,7 @@ void LastSupperApp::setup()
 	mFboOutputAttachment = 0;
 
 	// postprocessing filters
-	mMaskRect = MaskRect::create( mFbo.getWidth(), mFbo.getHeight() );
+	gd.mMaskRect = MaskRect::create( mFbo.getWidth(), mFbo.getHeight() );
 
 	// setup effects
 	mEffects.push_back( BlackEffect::create() );
@@ -165,15 +162,17 @@ void LastSupperApp::draw()
 
 void LastSupperApp::drawOutput()
 {
+	GlobalData &gd = GlobalData::get();
+
 	mFbo.bindFramebuffer();
 	gl::clear();
 	mEffects[ mEffectIndex ]->draw();
 	mFbo.unbindFramebuffer();
 
 	mFboOutputAttachment = 0;
-	if ( mMaskRect->isEnabled() )
+	if ( gd.mMaskRect->isEnabled() )
 	{
-		gl::Texture processed = mMaskRect->process( mFbo.getTexture( mFboOutputAttachment ) );
+		gl::Texture processed = gd.mMaskRect->process( mFbo.getTexture( mFboOutputAttachment ) );
 		mFbo.bindFramebuffer();
 		glDrawBuffer( GL_COLOR_ATTACHMENT0_EXT + ( mFboOutputAttachment ^ 1 ) );
 		gl::setViewport( mFbo.getBounds() );
