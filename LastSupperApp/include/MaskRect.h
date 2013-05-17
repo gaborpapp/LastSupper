@@ -25,6 +25,8 @@ class MaskRect
 		float mRectX1, mRectX2;
 		float mRectY1, mRectY2;
 
+		ci::Vec2f mOffset;
+
 		ci::Color mColor;
         ci::gl::Fbo mFbo;
 };
