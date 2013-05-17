@@ -28,6 +28,7 @@
 #include "GlobalData.h"
 
 #include "BlackEffect.h"
+#include "FadeFilter.h"
 #include "FluidParticlesEffect.h"
 
 using namespace ci;
@@ -66,6 +67,8 @@ class LastSupperApp : public AppBasic
 		vector< EffectRef > mEffects;
 		int mEffectIndex;
 		int mPrevEffectIndex;
+
+		FadeFilterRef mFadeFilter;
 
 #define FBO_WIDTH 1024
 #define FBO_HEIGHT 768
@@ -106,6 +109,7 @@ void LastSupperApp::setup()
 
 	// postprocessing filters
 	gd.mMaskRect = MaskRect::create( mFbo.getWidth(), mFbo.getHeight() );
+	mFadeFilter = FadeFilter::create( mFbo.getWidth(), mFbo.getHeight() );
 
 	// setup effects
 	mEffects.push_back( BlackEffect::create() );
@@ -173,6 +177,18 @@ void LastSupperApp::drawOutput()
 	if ( gd.mMaskRect->isEnabled() )
 	{
 		gl::Texture processed = gd.mMaskRect->process( mFbo.getTexture( mFboOutputAttachment ) );
+		mFbo.bindFramebuffer();
+		glDrawBuffer( GL_COLOR_ATTACHMENT0_EXT + ( mFboOutputAttachment ^ 1 ) );
+		gl::setViewport( mFbo.getBounds() );
+		gl::setMatricesWindow( mFbo.getSize(), false );
+		gl::color( Color::white() );
+		gl::draw( processed, mFbo.getBounds() );
+		mFbo.unbindFramebuffer();
+		mFboOutputAttachment ^= 1;
+	}
+	if ( mFadeFilter->isEnabled() )
+	{
+		gl::Texture processed = mFadeFilter->process( mFbo.getTexture( mFboOutputAttachment ) );
 		mFbo.bindFramebuffer();
 		glDrawBuffer( GL_COLOR_ATTACHMENT0_EXT + ( mFboOutputAttachment ^ 1 ) );
 		gl::setViewport( mFbo.getBounds() );
