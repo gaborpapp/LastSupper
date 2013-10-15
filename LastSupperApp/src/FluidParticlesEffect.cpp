@@ -99,7 +99,7 @@ void FluidParticlesEffect::setup()
 	mParams.addPersistentParam( "Wrap x", &mFluidWrapX, true );
 	mParams.addPersistentParam( "Wrap y", &mFluidWrapY, true );
 	mParams.addPersistentParam( "Fluid color", &mFluidColor, Color( 1.f, 0.05f, 0.01f ) );
-	mParams.addPersistentParam( "Fluid velocity mult", &mFluidVelocityMult, 10.f, "min=1 max=50 step=0.5" );
+	mParams.addPersistentParam( "Fluid velocity mult", &mFluidVelocityMult, 1.f, "min=0.02 max=50 step=0.02" );
 	mParams.addPersistentParam( "Fluid color mult", &mFluidColorMult, .5f, "min=0.05 max=10 step=0.05" );
 
 	mFluidSolver.setup( mFluidWidth, mFluidHeight );

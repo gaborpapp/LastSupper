@@ -35,10 +35,11 @@ FadeFilter::FadeFilter( int w, int h )
 {
 	GlobalData &gd = GlobalData::get();
 
-	mFade = 0;
 	gd.mPostProcessingParams.addPersistentParam( "FadeFilter enable", &mEnabled, false, "group=FadeFilter" );
+	mFade = 0.f;
+	gd.mPostProcessingParams.addParam( "Fade value", mFade.ptr(), "min=0 max=1 step=0.01 group=FadeFilter" );
 	gd.mPostProcessingParams.addPersistentParam( "Fade duration", &mFadeDuration, 2.f, "min=.5 step=.25 group=FadeFilter" );
-	gd.mPostProcessingParams.addPersistentParam( "Fade color", &mFadeColor, Color::white(), "group=FadeFilter" );
+	gd.mPostProcessingParams.addPersistentParam( "Fade color", &mFadeColor, Color::black(), "group=FadeFilter" );
 	gd.mPostProcessingParams.addButton( "Fade color white", [&]() { mFadeColor = Color::white(); }, "group=FadeFilter" );
 	gd.mPostProcessingParams.addButton( "Fade color black", [&]() { mFadeColor = Color::black(); }, "group=FadeFilter" );
 	gd.mPostProcessingParams.addButton( "Fade out", [&]() {
