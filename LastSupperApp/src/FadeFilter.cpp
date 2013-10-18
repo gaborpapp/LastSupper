@@ -43,13 +43,11 @@ FadeFilter::FadeFilter( int w, int h )
 	gd.mPostProcessingParams.addButton( "Fade color white", [&]() { mFadeColor = Color::white(); }, "group=FadeFilter" );
 	gd.mPostProcessingParams.addButton( "Fade color black", [&]() { mFadeColor = Color::black(); }, "group=FadeFilter" );
 	gd.mPostProcessingParams.addButton( "Fade out", [&]() {
-			mFade = 0.f;
-			app::timeline().apply( &mFade, 1.f, mFadeDuration );
-			}, "group=FadeFilter" );
+		fadeOut();
+	}, "group=FadeFilter" );
 	gd.mPostProcessingParams.addButton( "Fade in", [&]() {
-			mFade = 1.f;
-			app::timeline().apply( &mFade, 0.f, mFadeDuration );
-			}, "group=FadeFilter" );
+		fadeIn();
+	}, "group=FadeFilter" );
 	gd.mPostProcessingParams.setOptions( "FadeFilter", "opened=false" );
 
 	gl::Fbo::Format fboFormat;
@@ -70,6 +68,17 @@ FadeFilter::FadeFilter( int w, int h )
 	}
 }
 
+void FadeFilter::fadeIn()
+{
+	mFade = 1.f;
+	app::timeline().apply( &mFade, 0.f, mFadeDuration );
+}
+
+void FadeFilter::fadeOut()
+{
+	mFade = 0.f;
+	app::timeline().apply( &mFade, 1.f, mFadeDuration );
+}
 
 ci::gl::Texture FadeFilter::process( const ci::gl::Texture &source )
 {

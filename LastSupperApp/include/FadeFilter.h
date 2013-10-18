@@ -19,6 +19,9 @@ class FadeFilter
 
 		bool isEnabled() const { return mEnabled; }
 
+		void fadeIn();
+		void fadeOut();
+
 	private:
 		FadeFilter( int w, int h );
 
