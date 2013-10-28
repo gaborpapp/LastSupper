@@ -32,6 +32,10 @@
 #include "Capture1394PParams.h"
 #endif
 
+#ifdef CINDER_MSW
+#include "CaptureParams.h"
+#endif
+
 #include "mndlkit/params/PParams.h"
 
 namespace mndl {
@@ -75,7 +79,11 @@ class CaptureSource
 		int mSource; // recording or camera
 
 		// qtime capture
+#ifdef CINDER_MSW
+		std::vector< CaptureParamsRef > mCaptures;
+#else
 		std::vector< ci::CaptureRef > mCaptures;
+#endif
 		std::vector< std::string > mDeviceNames;
 		int mCurrentCapture;
 
@@ -83,10 +91,9 @@ class CaptureSource
 		// capture1394
 		mndl::Capture1394PParamsRef mCapture1394PParams;
 #endif
-
 		// params
 		mndl::params::PInterfaceGl mParams;
-		mndl::params::PInterfaceGl mCaptureParams;
+		mndl::params::PInterfaceGl mCaptureSelection;
 };
 
 } // namespace mndl;

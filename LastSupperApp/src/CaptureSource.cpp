@@ -54,12 +54,20 @@ void CaptureSource::setup()
 		{
 			if ( device->checkAvailable() )
 			{
+#ifdef CINDER_MSW
+				mCaptures.push_back( CaptureParams::create( 640, 480, device ) );
+#else
 				mCaptures.push_back( ci::Capture::create( 640, 480, device ) );
+#endif
 				mDeviceNames.push_back( deviceName );
 			}
 			else
 			{
+#ifdef CINDER_MSW
+				mCaptures.push_back( CaptureParamsRef() );
+#else
 				mCaptures.push_back( ci::CaptureRef() );
+#endif
 				mDeviceNames.push_back( deviceName + " not available" );
 			}
 		}
@@ -72,19 +80,23 @@ void CaptureSource::setup()
 	if ( mDeviceNames.empty() )
 	{
 		mDeviceNames.push_back( "Camera not available" );
+#ifdef CINDER_MSW
+		mCaptures.push_back( CaptureParamsRef() );
+#else
 		mCaptures.push_back( ci::CaptureRef() );
+#endif
 	}
 
 	GlobalData &gd = GlobalData::get();
 	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture Source", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 326 ) );
 	mParams.addPersistentSizeAndPosition();
-	mCaptureParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 432 ) );
-	mCaptureParams.addPersistentSizeAndPosition();
-	mCaptureParams.addPersistentParam( "Camera", mDeviceNames, &mCurrentCapture, 0 );
+	mCaptureSelection = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 432 ) );
+	mCaptureSelection.addPersistentSizeAndPosition();
+	mCaptureSelection.addPersistentParam( "Camera", mDeviceNames, &mCurrentCapture, 0 );
 	if ( mCurrentCapture >= (int)mCaptures.size() )
 		mCurrentCapture = 0;
 	setupParams();
-
+	CaptureParams::setup();
 }
 
 void CaptureSource::setupParams()
@@ -115,11 +127,14 @@ void CaptureSource::update()
 {
 	static int lastCapture = -1;
 	static int lastSource = -1;
+	bool resetParams = false;
 
 	// change gui buttons if switched between capture and playback
 	if ( lastSource != mSource )
 	{
 		setupParams();
+		CaptureParams::removeParams();
+		resetParams = true;
 		lastSource = mSource;
 	}
 
@@ -129,6 +144,8 @@ void CaptureSource::update()
 		// stop and start capture devices
 		if ( lastCapture != mCurrentCapture )
 		{
+			resetParams = true;
+
 			if ( ( lastCapture >= 0 ) && ( mCaptures[ lastCapture ] ) )
 				mCaptures[ lastCapture ]->stop();
 
@@ -137,6 +154,12 @@ void CaptureSource::update()
 
 			lastCapture = mCurrentCapture;
 		}
+
+		if ( resetParams )
+			mCaptures[ mCurrentCapture ]->buildParams();
+		else
+			mCaptures[ mCurrentCapture ]->updateParams();
+
 	}
 	else // SOURCE_RECORDING or SOURCE_CAPTURE1394
 	{
@@ -365,7 +388,7 @@ void CaptureSource::playVideoCB()
 void CaptureSource::drawParams()
 {
 	mParams.draw();
-	mCaptureParams.draw();
+	mCaptureSelection.draw();
 #ifdef CAPTURE_1394
 	mCapture1394PParams->drawParams();
 #endif

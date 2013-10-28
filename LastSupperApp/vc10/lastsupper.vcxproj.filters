@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="blocks">
+      <UniqueIdentifier>{edd5f717-696f-4567-8c69-371030e73cb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="blocks\mndlkit">
+      <UniqueIdentifier>{52ae3f2b-4517-4e40-999f-ec598ced9a10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="blocks\msafluid">
+      <UniqueIdentifier>{df8a0d3d-9be0-406e-b48f-b4fc23056581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="blocks\cinder-openCV">
+      <UniqueIdentifier>{ff4f2f11-82d9-4f9b-9b65-8d3fc6624f1a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\cinder_0.8.5\blocks\MndlKit\src\mndlkit\params\PParams.cpp">
+      <Filter>blocks\mndlkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CaptureSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FadeFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FluidParticles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FluidParticlesEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\KawaseStreak.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\LastSupperApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MaskRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\cinder_0.8.5\blocks\msaFluid\src\ciMsaFluidDrawerGl.cpp">
+      <Filter>blocks\msafluid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\cinder_0.8.5\blocks\msaFluid\src\ciMsaFluidSolver.cpp">
+      <Filter>blocks\msafluid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CaptureParams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\cinder_0.8.5\blocks\MndlKit\src\mndlkit\params\PParams.h">
+      <Filter>blocks\mndlkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\BlackEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CaptureSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Effect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\FadeFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\FluidParticles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\FluidParticlesEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GlobalData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\KawaseStreak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\MaskRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\cinder_0.8.5\blocks\msaFluid\include\ciMsaFluid.h">
+      <Filter>blocks\msafluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\cinder_0.8.5\blocks\msaFluid\include\ciMsaFluidDrawerGl.h">
+      <Filter>blocks\msafluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\cinder_0.8.5\blocks\msaFluid\include\ciMsaFluidParticleUpdater.h">
+      <Filter>blocks\msafluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\cinder_0.8.5\blocks\msaFluid\include\ciMsaFluidSolver.h">
+      <Filter>blocks\msafluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\cinder_0.8.5\blocks\Cinder-OpenCV\include\CinderOpenCV.h">
+      <Filter>blocks\cinder-openCV</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CaptureParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
