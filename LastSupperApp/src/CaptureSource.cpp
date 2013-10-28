@@ -96,7 +96,9 @@ void CaptureSource::setup()
 	if ( mCurrentCapture >= (int)mCaptures.size() )
 		mCurrentCapture = 0;
 	setupParams();
+#ifdef CINDER_MSW
 	CaptureParams::setup();
+#endif
 }
 
 void CaptureSource::setupParams()
@@ -133,7 +135,9 @@ void CaptureSource::update()
 	if ( lastSource != mSource )
 	{
 		setupParams();
+#ifdef CINDER_MSW
 		CaptureParams::removeParams();
+#endif
 		resetParams = true;
 		lastSource = mSource;
 	}
@@ -155,11 +159,12 @@ void CaptureSource::update()
 			lastCapture = mCurrentCapture;
 		}
 
+#ifdef CINDER_MSW
 		if ( resetParams )
 			mCaptures[ mCurrentCapture ]->buildParams();
 		else
 			mCaptures[ mCurrentCapture ]->updateParams();
-
+#endif
 	}
 	else // SOURCE_RECORDING or SOURCE_CAPTURE1394
 	{
