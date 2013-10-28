@@ -41,6 +41,13 @@ void CaptureSource::setup()
 	}
 #endif
 
+	GlobalData &gd = GlobalData::get();
+	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture Source", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 326 ) );
+	mParams.addPersistentSizeAndPosition();
+	mCaptureSelection = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 432 ) );
+	mCaptureSelection.addPersistentParam( "Capture width", &mCaptureResolution.x, 160, "", true );
+	mCaptureSelection.addPersistentParam( "Capture height", &mCaptureResolution.y, 120, "", true );
+
 	// capture
 	// list out the capture devices
 	vector< ci::Capture::DeviceRef > devices( ci::Capture::getDevices() );
@@ -55,9 +62,9 @@ void CaptureSource::setup()
 			if ( device->checkAvailable() )
 			{
 #ifdef CINDER_MSW
-				mCaptures.push_back( CaptureParams::create( 640, 480, device ) );
+				mCaptures.push_back( CaptureParams::create( mCaptureResolution.x, mCaptureResolution.y, device ) );
 #else
-				mCaptures.push_back( ci::Capture::create( 640, 480, device ) );
+				mCaptures.push_back( ci::Capture::create( mCaptureResolution.x, mCaptureResolution.y, device ) );
 #endif
 				mDeviceNames.push_back( deviceName );
 			}
@@ -87,12 +94,9 @@ void CaptureSource::setup()
 #endif
 	}
 
-	GlobalData &gd = GlobalData::get();
-	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture Source", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 326 ) );
-	mParams.addPersistentSizeAndPosition();
-	mCaptureSelection = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 432 ) );
 	mCaptureSelection.addPersistentSizeAndPosition();
 	mCaptureSelection.addPersistentParam( "Camera", mDeviceNames, &mCurrentCapture, 0 );
+
 	if ( mCurrentCapture >= (int)mCaptures.size() )
 		mCurrentCapture = 0;
 	setupParams();

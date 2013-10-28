@@ -78,6 +78,8 @@ class CaptureSource
 
 		int mSource; // recording or camera
 
+		ci::Vec2i mCaptureResolution;
+
 		// qtime capture
 #ifdef CINDER_MSW
 		std::vector< CaptureParamsRef > mCaptures;
