@@ -20,6 +20,7 @@
 #include "cinder/app/App.h"
 
 #include "CaptureSource.h"
+#include "GlobalData.h"
 
 using namespace std;
 
@@ -74,9 +75,10 @@ void CaptureSource::setup()
 		mCaptures.push_back( ci::CaptureRef() );
 	}
 
-	mParams = mndl::params::PInterfaceGl( "Capture Source", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 326 ) );
+	GlobalData &gd = GlobalData::get();
+	mParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture Source", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 326 ) );
 	mParams.addPersistentSizeAndPosition();
-	mCaptureParams = mndl::params::PInterfaceGl( "Capture", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 432 ) );
+	mCaptureParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Capture", ci::Vec2i( 310, 90 ), ci::Vec2i( 16, 432 ) );
 	mCaptureParams.addPersistentSizeAndPosition();
 	mCaptureParams.addPersistentParam( "Camera", mDeviceNames, &mCurrentCapture, 0 );
 	if ( mCurrentCapture >= (int)mCaptures.size() )

@@ -74,6 +74,9 @@ class LastSupperApp : public AppBasic
 #define FBO_HEIGHT 768
 		gl::Fbo mFbo;
 		int mFboOutputAttachment;
+
+		Vec2i mOutputWindowInitialPos;
+		bool mOutputWindowInitialFullscreen;
 };
 
 void LastSupperApp::prepareSettings( Settings *settings )
@@ -83,11 +86,11 @@ void LastSupperApp::prepareSettings( Settings *settings )
 
 void LastSupperApp::setup()
 {
+	mndl::params::PInterfaceGl::load( string( "params.xml" ) );
+
 	GlobalData &gd = GlobalData::get();
 	gd.mOutputWindow = getWindow();
 	gd.mControlWindow = createWindow( Window::Format().size( 1250, 700 ) );
-
-	mndl::params::PInterfaceGl::load( "params.xml" );
 
 	gd.mPostProcessingParams = mndl::params::PInterfaceGl( gd.mControlWindow, "Postprocessing", Vec2i( 200, 310 ), Vec2i( 516, 342 ) );
 	gd.mPostProcessingParams.addPersistentSizeAndPosition();
@@ -97,6 +100,13 @@ void LastSupperApp::setup()
 	mParams.addParam( "Fps", &mFps, "", true );
 	mParams.addPersistentParam( "Vertical sync", &mVerticalSyncEnabled, false );
 	mParams.addSeparator();
+	mParams.addPersistentParam( "Output fullscreen", &mOutputWindowInitialFullscreen, false );
+	mParams.addPersistentParam( "Output pos x", &mOutputWindowInitialPos.x, 0 );
+	mParams.addPersistentParam( "Output pos y", &mOutputWindowInitialPos.y, 0 );
+	mParams.addSeparator();
+
+	gd.mOutputWindow->setPos( mOutputWindowInitialPos );
+	gd.mOutputWindow->setFullScreen( mOutputWindowInitialFullscreen );
 
 	gd.mCaptureSource.setup();
 
@@ -136,6 +146,12 @@ void LastSupperApp::update()
 		gl::enableVerticalSync( mVerticalSyncEnabled );
 
 	GlobalData &gd = GlobalData::get();
+
+	if ( gd.mOutputWindow->getPos() != mOutputWindowInitialPos )
+	{
+		mOutputWindowInitialPos = gd.mOutputWindow->getPos();
+	}
+
 	gd.mCaptureSource.update();
 
 	// update current effect
