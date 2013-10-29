@@ -146,12 +146,6 @@ void LastSupperApp::update()
 		gl::enableVerticalSync( mVerticalSyncEnabled );
 
 	GlobalData &gd = GlobalData::get();
-
-	if ( gd.mOutputWindow->getPos() != mOutputWindowInitialPos )
-	{
-		mOutputWindowInitialPos = gd.mOutputWindow->getPos();
-	}
-
 	gd.mCaptureSource.update();
 
 	// update current effect
